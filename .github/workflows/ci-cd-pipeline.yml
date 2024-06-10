@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Java project
+        run: |
+          mkdir -p logs
+          javac SampleJavaApp.java > logs/build.log 2>&1
+          java SampleJavaApp >> logs/build.log 2>&1
+
+      - name: Run Checkstyle
+        run: |
+          echo "Running Checkstyle..."
+          wget -O checkstyle.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.5.0/checkstyle-10.5.0-all.jar
+          wget -O checkstyle.xml https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml
+          java -jar checkstyle.jar -c checkstyle.xml SampleJavaApp.java > logs/checkstyle-result.xml 2>&1
+
+      - name: Upload build logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-logs
+          path: logs/build.log
+
+      - name: Upload Checkstyle results
+        uses: actions/upload-artifact@v3
+        with:
+          name: checkstyle-results
+          path: logs/checkstyle-result.xml
