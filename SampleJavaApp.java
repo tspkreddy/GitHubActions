@@ -13,8 +13,8 @@ public class SampleJavaApp {
     }
 
     public void performOperation() {
-        logger.info("Performing operation...");
-        // Simulate some work
+        logger.info("Performing operations...");
+
         for (int i = 0; i < 5; i++) {
             logger.info("Operation step " + i);
         }
